@@ -5,6 +5,7 @@
 Misc.
 
 * Change branching model to fast-forward merge on the master branch.
+* Add accessors to RSA padding mode.
 
 Bugfixes
 
