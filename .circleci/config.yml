@@ -152,7 +152,7 @@ workflows:
   build:
     jobs:
       - python_extra
-      # - python_39  # Requires Python 3.0
+      - python_39  # Requires Python 3.0
       - python_38
       - python_37
       - python_36
