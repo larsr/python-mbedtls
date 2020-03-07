@@ -7,6 +7,6 @@ exclude_lines =
   def __repr__
   raise MemoryError()
   raise NotImplementedError
-  free(\w)
+  return NotImplemented
 include =
   src/*
