@@ -1120,6 +1120,12 @@ cdef class ClientContext(_BaseContext):
             self._set_hostname(server_hostname)
         return TLSWrappedBuffer(self)
 
+    def _set_ec_j_pake_password(self, ecjpake_pw):
+        """Set the EC J PAKE password."""
+        _tls.mbedtls_ssl_set_hs_ecjpake_password(
+            &self._ctx, ecjpake_pw, len(ecjpake_pw)
+        )
+
     def _set_hostname(self, hostname):
         """Set the hostname to check against the received server."""
         if hostname is None:
