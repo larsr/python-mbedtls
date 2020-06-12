@@ -117,10 +117,10 @@ cdef class MDBase:
         return _md.mbedtls_md_get_name(self._info).decode("ascii").lower()
 
     cdef _finish(self, const unsigned char *output):
-        return -0x5100  # Bad input data error.
+        raise NotImplementedError()  # pragma: no cover
 
     def update(self, const unsigned char[:] buffer not None):
-        return -0x5100  # Bad input data error.
+        raise NotImplementedError()  # pragma: no cover
 
     def digest(self):
         """Return the digest output of `message`."""
@@ -128,12 +128,12 @@ cdef class MDBase:
         cdef unsigned char* output = <unsigned char*>malloc(
             sz * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(self._finish(output))
             return output[:self.digest_size]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def hexdigest(self):
         """Like digest except the digest is returned as a string object
@@ -144,7 +144,7 @@ cdef class MDBase:
 
     def copy(self):
         """Return a copy ("clone") of the MD object."""
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
 
 cdef class Hash(_md.MDBase):

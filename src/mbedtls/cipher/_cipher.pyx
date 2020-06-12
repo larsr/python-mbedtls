@@ -8,11 +8,11 @@
 cimport mbedtls.cipher._cipher as _cipher
 from libc.stdlib cimport malloc, free
 
-try:
+import sys as _sys
+if _sys.version_info > (3, 4):
     from contextlib import suppress
-except ImportError:
-    # Python 2.7
-    from contextlib2 import suppress
+else:
+    from contextlib2 import suppress  # pragma: no cover
 
 import enum
 
@@ -250,10 +250,10 @@ cdef class _CipherBase:
         return _cipher.mbedtls_cipher_get_key_bitlen(&self._enc_ctx) // 8
 
     def encrypt(self, const unsigned char[:] message not None):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def decrypt(self, const unsigned char[:] message not None):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
 
 cdef class Cipher(_CipherBase):
@@ -269,7 +269,7 @@ cdef class Cipher(_CipherBase):
         cdef unsigned char* output = <unsigned char*>malloc(
             sz * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             # We can call `check_error` directly here because we return a
             # python object.
@@ -280,7 +280,7 @@ cdef class Cipher(_CipherBase):
                 &input[0], input.size, output, &olen))
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def encrypt(self, const unsigned char[:] message not None):
         return self._crypt(self._iv, message, _cipher.MBEDTLS_ENCRYPT)
@@ -313,7 +313,7 @@ cdef class AEADCipher(_CipherBase):
         cdef unsigned char* output = <unsigned char*>malloc(
             sz * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             if ad.size:
                 pad = <const unsigned char*> &ad[0]
@@ -326,7 +326,7 @@ cdef class AEADCipher(_CipherBase):
                 tag, sizeof(tag)))
             return output[:olen], tag[:16]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     cdef _aead_decrypt(self,
                 const unsigned char[:] iv,
@@ -342,7 +342,7 @@ cdef class AEADCipher(_CipherBase):
         cdef unsigned char* output = <unsigned char*>malloc(
             sz * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             if ad.size:
                 pad = <const unsigned char*> &ad[0]
@@ -355,7 +355,7 @@ cdef class AEADCipher(_CipherBase):
                 &tag[0], tag.size))
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def encrypt(self, const unsigned char[:] message not None):
         return self._aead_encrypt(self._iv, self._ad, message)

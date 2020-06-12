@@ -48,7 +48,7 @@ def hkdf(
         length * sizeof(unsigned char)
     )
     if not okm:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         _exc.check_error(_hkdf.mbedtls_hkdf(
             hmac._info,
@@ -61,7 +61,7 @@ def hkdf(
         ))
         return okm[:length]
     finally:
-        free(okm)
+        free(okm)  # pragma: no cover
 
 
 def extract(
@@ -94,7 +94,7 @@ def extract(
         hmac.digest_size * sizeof(unsigned char)
     )
     if not prk:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         _exc.check_error(_hkdf.mbedtls_hkdf_extract(
             hmac._info,
@@ -105,7 +105,7 @@ def extract(
         ))
         return prk[:hmac.digest_size]
     finally:
-        free(prk)
+        free(prk)  # pragma: no cover
 
 
 def expand(
@@ -139,7 +139,7 @@ def expand(
         length * sizeof(unsigned char)
     )
     if not okm:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         _exc.check_error(_hkdf.mbedtls_hkdf_expand(
             hmac._info,
@@ -150,4 +150,4 @@ def expand(
         ))
         return okm[:length]
     finally:
-        free(okm)
+        free(okm)  # pragma: no cover

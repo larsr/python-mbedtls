@@ -31,7 +31,7 @@ class TLSError(Exception):
         cdef size_t buflen = 200
         cdef char* buffer = <char*>malloc(buflen * sizeof(char))
         if not buffer:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.mbedtls_strerror(self.err, &buffer[0], buflen)
             output = bytes(buffer[:buflen])
@@ -41,7 +41,7 @@ class TLSError(Exception):
                 olen = buflen
             return output[:olen].decode("ascii")
         finally:
-            free(buffer)
+            free(buffer)  # pragma: no cover
 
     def __str__(self):
         if self.err is None:

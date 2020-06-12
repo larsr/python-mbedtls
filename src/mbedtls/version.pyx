@@ -29,13 +29,13 @@ cdef __version():
     cdef char *output = <char *>malloc(18 * sizeof(char))
     cdef bytes buffer
     if not output:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         _ver.mbedtls_version_get_string_full(output)
         buffer = output
         return buffer.decode("ascii")
     finally:
-        free(output)
+        free(output)  # pragma: no cover
 
 
 cdef _has_feature(feature):

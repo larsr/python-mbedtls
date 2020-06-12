@@ -12,11 +12,11 @@ cimport mbedtls.pk as _pk
 
 import base64
 import datetime as dt
-try:
+import sys as _sys
+if _sys.version_info > (3, 4):
     from contextlib import suppress
-except ImportError:
-    # Python 2.7
-    from contextlib2 import suppress
+else:
+    from contextlib2 import suppress  # pragma: no cover
 from collections import namedtuple
 
 import mbedtls.exceptions as _exc
@@ -72,15 +72,15 @@ cdef class Certificate:
     @classmethod
     def from_file(cls, path):
         # PEP 543
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     @classmethod
     def from_DER(cls, der):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     @classmethod
     def from_PEM(cls, pem):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def __hash__(self):
         return hash(self.to_DER())
@@ -92,7 +92,7 @@ cdef class Certificate:
             return other == self.to_DER() or other == self.to_PEM()
 
     def __str__(self):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def __bytes__(self):
         return self.to_DER()
@@ -108,10 +108,10 @@ cdef class Certificate:
         return self.to_DER()
 
     def to_DER(self):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def to_PEM(self):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
 
 class BasicConstraints(
@@ -152,13 +152,13 @@ cdef class CRT(Certificate):
         cdef char *output = <char *>malloc(osize * sizeof(char))
         cdef char *prefix = b""
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = _exc.check_error(x509.mbedtls_x509_crt_info(
                 &output[0], osize, prefix, &self._ctx))
             return output[:written].decode("utf8")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     # RFC 5280, Section 4.1 Basic Certificate Fields
     # RFC 5280, Section 4.1.1 Certificate Fields
@@ -233,13 +233,13 @@ cdef class CRT(Certificate):
         cdef size_t osize = 200
         cdef char* c_buf = <char *>malloc(osize * sizeof(char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = x509.mbedtls_x509_dn_gets(
                 &c_buf[0], osize, &self._ctx.issuer)
             return c_buf[:written].decode("utf8")
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     @property
     def not_before(self):
@@ -278,13 +278,13 @@ cdef class CRT(Certificate):
         cdef size_t osize = 200
         cdef char *c_buf = <char *>malloc(osize * sizeof(char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = x509.mbedtls_x509_dn_gets(
                 &c_buf[0], osize, &self._ctx.subject)
             return c_buf[:written].decode("utf8")
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     @property
     def subject_public_key(self):
@@ -306,13 +306,13 @@ cdef class CRT(Certificate):
         cdef unsigned char *c_buf = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             ret = _exc.check_error(_pk.mbedtls_pk_write_pubkey_der(
                 &self._ctx.pk, &c_buf[0], osize))
             return cipher.from_DER(c_buf[osize - ret:osize])
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     # RFC 5280, Section 4.1.2.8 Unique Identifiers
     # RFC 5280, Section 4.1.2.9 Extensions
@@ -505,13 +505,13 @@ cdef class _CRTWriter:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = _exc.check_error(x509.mbedtls_x509write_crt_der(
                 &self._ctx, &output[0], osize, NULL, NULL))
             return output[osize - written:osize]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def to_bytes(self):
         return self.to_DER()
@@ -659,13 +659,13 @@ cdef class CSR(Certificate):
         cdef char *output = <char *>malloc(osize * sizeof(char))
         cdef char *prefix = b""
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = _exc.check_error(x509.mbedtls_x509_csr_info(
                 &output[0], osize, prefix, &self._ctx))
             return output[:written].decode("utf8")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     @property
     def digestmod(self):
@@ -698,13 +698,13 @@ cdef class CSR(Certificate):
         cdef size_t osize = 200
         cdef char *c_buf = <char *>malloc(osize * sizeof(char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = x509.mbedtls_x509_dn_gets(
                 &c_buf[0], osize, &self._ctx.subject)
             return c_buf[:written].decode("utf8")
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     @property
     def subject_public_key(self):
@@ -726,13 +726,13 @@ cdef class CSR(Certificate):
         cdef unsigned char *c_buf = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             ret = _exc.check_error(_pk.mbedtls_pk_write_pubkey_der(
                 &self._ctx.pk, &c_buf[0], osize))
             return cipher.from_DER(c_buf[osize - ret:osize])
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     @classmethod
     def from_file(cls, path):
@@ -834,13 +834,13 @@ cdef class _CSRWriter:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = _exc.check_error(x509.mbedtls_x509write_csr_der(
                 &self._ctx, &output[0], osize, NULL, NULL))
             return output[osize - written:osize]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def to_bytes(self):
         return self.to_DER()
@@ -884,13 +884,13 @@ cdef class CRL(Certificate):
         cdef char *output = <char *>malloc(osize * sizeof(char))
         cdef char *prefix = b""
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = _exc.check_error(x509.mbedtls_x509_crl_info(
                 &output[0], osize, prefix, &self._ctx))
             return output[:written].decode("utf8")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     # RFC 5280, Section 5.1 CRL Fields
     # RFC 5280, Section 5.1.1 Certificate List Fields
@@ -941,13 +941,13 @@ cdef class CRL(Certificate):
         cdef size_t osize = 200
         cdef char* c_buf = <char *>malloc(osize * sizeof(char))
         if not c_buf:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             written = x509.mbedtls_x509_dn_gets(
                 &c_buf[0], osize, &self._ctx.issuer)
             return c_buf[:written].decode("utf8")
         finally:
-            free(c_buf)
+            free(c_buf)  # pragma: no cover
 
     @property
     def this_update(self):

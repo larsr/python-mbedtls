@@ -24,7 +24,7 @@ cdef c_init(_rb.ring_buffer_ctx *ctx, size_t maxlen):
     ctx._size = maxlen + 1
     ctx.buf = <unsigned char *>malloc(ctx._size * sizeof(unsigned char))
     if not ctx.buf:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     ctx.head = ctx.tail = ctx.buf
 
 
@@ -61,12 +61,12 @@ cdef c_peek(ring_buffer_ctx *ctx, size_t amt):
     cdef unsigned char *dst = <unsigned char *>malloc(
         min(amt, c_len(ctx) * sizeof(unsigned char)))
     if not dst:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         nread = c_peekinto(ctx, dst, amt)
         return bytes(dst[:nread])
     finally:
-        free(dst)
+        free(dst)  # pragma: no cover
 
 
 @cython.boundscheck(False)
@@ -91,12 +91,12 @@ cdef c_read(ring_buffer_ctx *ctx, size_t amt):
     cdef unsigned char *dst = <unsigned char *>malloc(
         min(amt, c_len(ctx)) * sizeof(unsigned char))
     if not dst:
-        raise MemoryError()
+        raise MemoryError()  # pragma: no cover
     try:
         nread = c_readinto(ctx, dst, amt)
         return bytes(dst[:nread])
     finally:
-        free(dst)
+        free(dst)  # pragma: no cover
 
 
 @cython.boundscheck(False)

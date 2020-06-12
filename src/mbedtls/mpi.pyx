@@ -98,7 +98,7 @@ cdef class MPI:
         cdef unsigned char* output = <unsigned char*>malloc(
             length * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_mpi.mbedtls_mpi_write_binary(
                 &self._ctx, output, length))
@@ -106,7 +106,7 @@ cdef class MPI:
         except Exception as exc:
             raise OverflowError from exc
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     __bytes__ = to_bytes
 

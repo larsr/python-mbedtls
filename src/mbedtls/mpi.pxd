@@ -113,7 +113,7 @@ cdef class MPI:
     cdef size_t _len(self)
 
 
-cdef inline from_mpi(mbedtls_mpi *c_mpi):
+cdef inline from_mpi(mbedtls_mpi *c_mpi):  # pragma: no cover
     new_mpi = MPI()
     mbedtls_mpi_copy(&new_mpi._ctx, c_mpi)
     return new_mpi

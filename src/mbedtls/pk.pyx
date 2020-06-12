@@ -230,7 +230,7 @@ cdef class CipherBase:
                 password-protected private keys.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     @classmethod
     def from_DER(cls, const unsigned char[:] key not None):
@@ -263,11 +263,11 @@ cdef class CipherBase:
 
     def _has_private(self):
         """Return `True` if the key contains a valid private half."""
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def _has_public(self):
         """Return `True` if the key contains a valid public half."""
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def sign(self,
              const unsigned char[:] message not None,
@@ -293,7 +293,7 @@ cdef class CipherBase:
         cdef unsigned char* output = <unsigned char*>malloc(
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_pk_sign(
                 &self._ctx, md_alg._type,
@@ -303,7 +303,7 @@ cdef class CipherBase:
             assert sig_len != 0
             return output[:sig_len]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def verify(self,
                const unsigned char[:] message not None,
@@ -344,7 +344,7 @@ cdef class CipherBase:
         cdef unsigned char* output = <unsigned char*>malloc(
             _mpi.MBEDTLS_MPI_MAX_SIZE // 2 * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_pk_encrypt(
                 &self._ctx, &message[0], message.size,
@@ -352,7 +352,7 @@ cdef class CipherBase:
                 &_rnd.mbedtls_ctr_drbg_random, &__rng._ctx))
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def decrypt(self, const unsigned char[:] message not None):
         """Decrypt message (including padding if relevant).
@@ -367,7 +367,7 @@ cdef class CipherBase:
         cdef unsigned char* output = <unsigned char*>malloc(
             _mpi.MBEDTLS_MPI_MAX_SIZE // 2 * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_pk_decrypt(
                 &self._ctx, &message[0], message.size,
@@ -375,7 +375,7 @@ cdef class CipherBase:
                 &_rnd.mbedtls_ctr_drbg_random, &__rng._ctx))
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def generate(self):
         """Generate a keypair.
@@ -384,7 +384,7 @@ cdef class CipherBase:
             (bytes): The private key in DER format.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def _private_to_DER(self):
         if not self._has_private():
@@ -394,13 +394,13 @@ cdef class CipherBase:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             olen = _exc.check_error(
                 _pk.mbedtls_pk_write_key_der(&self._ctx, output, osize))
             return output[osize - olen:osize]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def _private_to_PEM(self):
         if not self._has_private():
@@ -409,14 +409,14 @@ cdef class CipherBase:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         memset(output, 0, osize)
         try:
             _exc.check_error(
                 _pk.mbedtls_pk_write_key_pem(&self._ctx, output, osize))
             return output[0:osize].decode("ascii")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def export_key(self, format="DER"):
         """Return the private key.
@@ -441,13 +441,13 @@ cdef class CipherBase:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             olen = _exc.check_error(
                 _pk.mbedtls_pk_write_pubkey_der(&self._ctx, output, osize))
             return output[osize - olen:osize]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def _public_to_PEM(self):
         if not self._has_public():
@@ -456,14 +456,14 @@ cdef class CipherBase:
         cdef unsigned char *output = <unsigned char *>malloc(
             osize * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         memset(output, 0, osize)
         try:
             _exc.check_error(
                 _pk.mbedtls_pk_write_pubkey_pem(&self._ctx, output, osize))
             return output[0:osize].decode("ascii")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def export_public_key(self, format="DER"):
         """Return the public key.
@@ -814,7 +814,7 @@ cdef class DHBase:
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         cdef size_t olen = 0
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(mbedtls_dhm_calc_secret(
                 &self._ctx, &output[0], _mpi.MBEDTLS_MPI_MAX_SIZE, &olen,
@@ -823,7 +823,7 @@ cdef class DHBase:
             _mpi.mbedtls_mpi_read_binary(&mpi._ctx, &output[0], olen)
             return mpi
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     
 cdef class DHServer(DHBase):
@@ -841,7 +841,7 @@ cdef class DHServer(DHBase):
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         cdef size_t olen = 0
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_dhm_make_params(
                 &self._ctx, self.key_size, &output[0], &olen,
@@ -849,7 +849,7 @@ cdef class DHServer(DHBase):
             assert olen != 0
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def import_CKE(self, const unsigned char[:] buffer not None):
         """Read the ClientKeyExchange payload."""
@@ -874,7 +874,7 @@ cdef class DHClient(DHBase):
         cdef unsigned char* output = <unsigned char*>malloc(
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_dhm_make_public(
                 &self._ctx, self.key_size, &output[0], self.key_size,
@@ -883,7 +883,7 @@ cdef class DHClient(DHBase):
             return mpi.to_bytes(
                 _mpi.mbedtls_mpi_size(&mpi._ctx), "big")
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def import_SKE(self, const unsigned char[:] buffer not None):
         """Read the ServerKeyExchange payload."""
@@ -974,7 +974,7 @@ cdef class ECDHBase:
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         cdef size_t olen = 0
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(mbedtls_ecdh_calc_secret(
                 &self._ctx, &olen, &output[0], _mpi.MBEDTLS_MPI_MAX_SIZE,
@@ -983,7 +983,7 @@ cdef class ECDHBase:
             _mpi.mbedtls_mpi_read_binary(&mpi._ctx, &output[0], olen)
             return mpi
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def generate_public_key(self):
         """Generate public key from a private key."""
@@ -1036,7 +1036,7 @@ cdef class ECDHServer(ECDHBase):
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         cdef size_t olen = 0
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_ecdh_make_params(
                 &self._ctx, &olen, &output[0], _mpi.MBEDTLS_MPI_MAX_SIZE,
@@ -1044,7 +1044,7 @@ cdef class ECDHServer(ECDHBase):
             assert olen != 0
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def import_CKE(self, const unsigned char[:] buffer not None):
         """Read the ClientKeyExchange payload."""
@@ -1073,7 +1073,7 @@ cdef class ECDHClient(ECDHBase):
             _mpi.MBEDTLS_MPI_MAX_SIZE * sizeof(unsigned char))
         cdef size_t olen = 0
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             _exc.check_error(_pk.mbedtls_ecdh_make_public(
                 &self._ctx, &olen, &output[0], _mpi.MBEDTLS_MPI_MAX_SIZE,
@@ -1081,7 +1081,7 @@ cdef class ECDHClient(ECDHBase):
             assert olen != 0
             return output[:olen]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def import_SKE(self, const unsigned char[:] buffer not None):
         """Read the ServerKeyExchange payload."""

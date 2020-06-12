@@ -14,17 +14,17 @@ cimport mbedtls.tls as _tls
 cimport mbedtls.x509 as _x509
 
 import socket as _socket
+import sys as _sys
 from collections import namedtuple
-try:
+if _sys.version_info > (3, ):
     from collections import abc
-except ImportError:
-    # Python 2.7
-    import collections as abc
-try:
+else:
+    import collections as abc  # pragma: no cover
+
+if _sys.version_info > (3, 4):
     from contextlib import suppress
-except ImportError:
-    # Python 2.7
-    from contextlib2 import suppress
+else:
+    from contextlib2 import suppress  # pragma: no cover
 from enum import Enum, IntEnum
 from itertools import tee
 
@@ -373,14 +373,14 @@ cdef class _BaseConfiguration:
         cdef int ciphers_sz = len(ciphers_available()) + 1
         self._ciphers = <int *>malloc(ciphers_sz * sizeof(int))
         if not self._ciphers:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         for idx in range(ciphers_sz):
             self._ciphers[idx] = 0
 
         cdef int protos_sz = len(NextProtocol) + 1
         self._protos = <char **>malloc(protos_sz * sizeof(char *))
         if not self._protos:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         for idx in range(protos_sz):
             self._protos[idx] = NULL
 
@@ -559,7 +559,7 @@ cdef class _BaseConfiguration:
 
     @property
     def lowest_supported_version(self):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     cdef _set_highest_supported_version(self, version):
         """The maximum version of TLS that should be allowed.
@@ -577,7 +577,7 @@ cdef class _BaseConfiguration:
 
     @property
     def highest_supported_version(self):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     cdef _set_trust_store(self, store):
         """The trust store that connections will use.
@@ -608,7 +608,7 @@ cdef class _BaseConfiguration:
         if callback is None:
             return
         # mbedtls_ssl_conf_sni
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     @property
     def sni_callback(self):
@@ -658,7 +658,7 @@ cdef class _BaseConfiguration:
         return psk_store.unwrap()
 
     def update(self, *args):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
 
 cdef class TLSConfiguration(_BaseConfiguration):
@@ -1381,7 +1381,7 @@ cdef class TLSWrappedSocket:
         return self._buffer.read(bufsize)
 
     def recv_into(self, buffer, nbytes=None, flags=0):
-        raise NotImplementedError
+        raise NotImplementedError()  # pragma: no cover
 
     def recvfrom(self, bufsize, flags=0):
         encrypted, addr = self._socket.recvfrom(bufsize, flags)

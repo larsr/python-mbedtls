@@ -39,12 +39,12 @@ cdef class _Entropy:
             length * sizeof(unsigned char)
         )
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             check_error(_rnd.mbedtls_entropy_func(&self._ctx, output, length))
             return output[:length]
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def update(self, const unsigned char[:] data):
         """Add data to the accumulator manually."""
@@ -94,7 +94,7 @@ cdef class Random:
             length * sizeof(unsigned char)
         )
         if not output:
-            raise MemoryError()
+            raise MemoryError()  # pragma: no cover
         try:
             check_error(
                 _rnd.mbedtls_ctr_drbg_random(&self._ctx, output, length)
@@ -103,7 +103,7 @@ cdef class Random:
             _plt.mbedtls_platform_zeroize(output, length)
             return ret
         finally:
-            free(output)
+            free(output)  # pragma: no cover
 
     def randbelow(self, upper_bound):
         """Return a random int in the range [0, n).
