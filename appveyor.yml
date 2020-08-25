@@ -1,0 +1,20 @@
+# appveyor.yml
+---
+environment:
+  matrix:
+    # http://www.appveyor.com/docs/installed-software#python
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python36-x64"
+
+install:
+  # - ps: /// powershell
+  # - cmd: /// batch
+  - ps: Start-FileDownload 'https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.16.7.zip'
+  # - cmd: curl -LO 'https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.16.7.zip'
+  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
+  - "%PYTHON%\\python.exe -m pip install -r requirements\\build.txt"
+  - "%PYTHON%\\python.exe -m pip install -r requirements\\tests.txt"
+
+build: off
